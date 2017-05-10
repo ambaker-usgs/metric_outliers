@@ -2,31 +2,6 @@ import commands
 
 from obspy.core import UTCDateTime
 
-# def metric_dead_channels(ws, we):
-#     header = 'Dead Channels:\n'
-#     results = commands.getstatusoutput('/APPS/bin/dqa4h.py -w prod -m DeadChannelMetric:4-8 -b %s -e %s' % (ws, we))[1].strip().split('\n')
-#     dead_channels = {}
-#     for result in results:
-#         date, net, sta, loc, chan, metric_name, value = result.split()
-#         if float(value) < dead_channel_threshhold:
-#             if '_'.join([net,sta]) not in dead_channels.keys():
-#                 dead_channels['_'.join([net, sta])] = []
-#             dead_channels['_'.join([net, sta])].append('-'.join([loc, chan]))
-#     return make_readable(header, dead_channels)
-#
-# def metric_pegged_mass_positions(ws, we):
-#     'Identify stations with pegged mass positions'
-#     header = 'Pegged:\n'
-#     results = commands.getstatusoutput('/APPS/bin/dqa4h.py -w prod -m MassPositionMetric -b %s -e %s' % (ws, we))[1].strip().split('\n')
-#     pegged_masses = {}
-#     for result in results:
-#         date, net, sta, loc, chan, metric, value = result.split()
-#         if float(value) >= mass_position_threshhold:
-#             if '_'.join([net, sta]) not in pegged_masses.keys():
-#                 pegged_masses['_'.join([net, sta])] = []
-#             pegged_masses['_'.join([net, sta])].append('-'.join([loc, chan]))
-#     return make_readable(header, pegged_masses)
-
 def metric_outliers(header, metric_name, window_start, window_end, inequality, threshhold):
     'Identify outlying stations for given metric'
     results = commands.getstatusoutput('/APPS/bin/dqa4h.py -w prod -m %s -b %s -e %s' % (metric_name, window_start, window_end))[1]
