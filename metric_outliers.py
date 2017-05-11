@@ -12,20 +12,6 @@ availability_threshhold = 10.0
 
 networks_blacklist = ['GT','II']
 
-# def metric_outliers(header, metric_name, date, inequality, threshhold):
-#     'Identify outlying stations for given metric'
-#     results = commands.getstatusoutput('/APPS/bin/dqa4h.py -w prod -m %s -b %s -e %s' % (metric_name, date, date))[1]
-#     results = results.strip().split('\n')
-#     outliers = {}
-#     for result in results:
-#         date, net, sta, loc, chan, metric, value = result.split()
-#         if eval('float(value) %s %s' % (inequality, threshhold)):
-#             if '_'.join([net, sta]) not in outliers.keys():
-#                 outliers['_'.join([net, sta])] = []
-#             outliers['_'.join([net, sta])].append('-'.join([loc, chan]))
-#     return outliers
-    # return make_readable(header, outliers)
-
 def metric_outliers(metric_name, date, inequality, threshhold):
     'Identify outlying stations for given metric'
     results = commands.getstatusoutput('/APPS/bin/dqa4h.py -w prod -m %s -b %s -e %s' % (metric_name, date, date))[1]
