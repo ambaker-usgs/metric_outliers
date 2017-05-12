@@ -47,13 +47,19 @@ def metric_availability(metric_name, date, inequality, threshhold):
     return outliers
 
 def make_readable(header, outliers):
-    header = ' %s:' % header
+    output = ''
     for outlier in outliers:
         netsta, locchan = outlier.split()
-        if netsta not in header:
-            header += '\n  %-7s' % netsta
-        header += ' %s' % locchan
-    return header + '\n'
+        if netsta not in output:
+            output += '\n%s: %-8s' % (header, netsta)
+        output += ' %-7s' % locchan
+    # header = ' %s:' % header
+    # for outlier in outliers:
+    #     netsta, locchan = outlier.split()
+    #     if netsta not in header:
+    #         header += '\n  %-7s' % netsta
+    #     header += ' %s' % locchan
+    return output + '\n'
 
 def sort_problems(outliers_newer, outliers_older):
     'Sort the issues into new, ongoing, and resolved'
@@ -71,13 +77,13 @@ def sort_problems(outliers_newer, outliers_older):
 if __name__ == '__main__':
     current_time = UTCDateTime.now()
     window_of_time = [current_time - 2*24*60*60, current_time - 3*24*60*60]
-    problems_new = '== New Issues ==\n'
+    problems_new = '== New Issues =='
     problems_ongoing = '\n== Ongoing Issues ==\n'
     problems_resolved = '\n== Resolved Issues ==\n'
     # Metrics to look at; nickname, metric name, threshhold inequality, threshhold
     metrics = [['Dead Channels', 'DeadChannelMetric:4-8', '<', dead_channels_threshhold],
                ['Pegged Masses', 'MassPositionMetric', '>=', pegged_masses_threshhold],
-               ['Timing Probs', 'TimingQualityMetric', '<', timing_quality_threshhold],
+               ['Timing Probs ', 'TimingQualityMetric', '<', timing_quality_threshhold],
                ['Gaps', 'GapCountMetric', '>=', gaps_threshhold],
                ['Gain Problems', 'DifferencePBM:4-8', '>=', gain_problems_threshhold]]
     for metric in metrics:
