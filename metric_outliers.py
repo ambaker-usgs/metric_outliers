@@ -130,8 +130,7 @@ def write_to_file(date, new, ongoing, resolved, mailto=False):
     output.extend(ongoing)
     output.append('\n == RESOLVED ISSUES ==')
     output.extend(resolved)
-    fob = open('metric_outliers.txt','w')
-    fob.write('')
+    fob = open('/home/ambaker/metric_outliers/metric_outliers.txt','w')
     fob.write('\n'.join(output))
     fob.close()
     # print '\n'.join(output)
@@ -142,6 +141,7 @@ def write_to_file(date, new, ongoing, resolved, mailto=False):
             command += 'tstorm@usgs.gov,aringler@usgs.gov,dwilson@usgs.gov,aaholland@usgs.gov, met@iris.washington.edu, lsandoval@usgs.gov, kschramm@usgs.gov,'
         command += 'ambaker@usgs.gov </dev/null'
         commands.getstatusoutput(command)
+    commands.getstatusoutput('rm /home/ambaker/metric_outliers/metric_outliers.txt')
 
 if __name__ == '__main__':
     date = UTCDateTime.now() - 2*24*60*60
