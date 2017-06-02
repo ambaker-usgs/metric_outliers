@@ -5,7 +5,8 @@ import os
 from obspy.core import UTCDateTime
 
 path_to_dqa = '/home/ambaker/asl-dqa-tools/'
-networks_blacklist = ['GT','II']
+master_blacklist = ['GS_OK031']
+availability_blacklist = ['GT','II']
 
 #threshholds
 dead_chan_threshhold = 1.0
@@ -19,6 +20,14 @@ debug = False
 
 class Issue(object):
     def __init__(self, nickname, newer_issues, older_issues):
+        #filter out the blacklisted networks and stations
+        for netsta in master_blacklist:
+            for nissue in newer_issues:
+                if netsta in nissue:
+                    newer_issues.pop(newer_issues.index(nissue))
+            for oissue in older_issues:
+                if netsta in oissue:
+                    older_issues.pop(older_issues.index(oissue))
         self.nickname = nickname
         self.newer = newer_issues
         self.older = older_issues
@@ -37,7 +46,7 @@ def metric_outliers(results, inequality, threshhold):
     for result in results:
         date, net, sta, loc, chan, metric, value = result.split()
         if eval('float(value) %s %s' % (inequality, threshhold)):
-            outliers.append('%-2s-%-5s %-2s-%-3s' % (net, sta, loc, chan))
+            outliers.append('%-2s_%-5s %-2s-%-3s' % (net, sta, loc, chan))
     return outliers
 
 def timing_outliers(results, inequality, threshhold):
@@ -46,7 +55,7 @@ def timing_outliers(results, inequality, threshhold):
     for result in results:
         date, net, sta, loc, chan, metric, value = result.split()
         if eval('float(value) %s %s' % (inequality, threshhold)):
-            outliers.append('%-2s-%-5s %-2s-%-2s*' % (net, sta, loc, chan[:2]))
+            outliers.append('%-2s_%-5s %-2s-%-2s*' % (net, sta, loc, chan[:2]))
     return outliers
 
 def gap_outliers(results, inequality, threshhold):
@@ -61,7 +70,7 @@ def gap_outliers(results, inequality, threshhold):
             outlier_counts[netsta] += 1
     outliers = []
     for netsta, count in outlier_counts.items():
-        outliers.append('%-2s-%-5s %s channels' % (net, sta, count))
+        outliers.append('%-2s_%-5s %s channels' % (net, sta, count))
     return outliers
 
 def gain_outliers(results, inequality, threshhold):
@@ -70,7 +79,7 @@ def gain_outliers(results, inequality, threshhold):
     for result in results:
         date, net, sta, loc, chan, metric, value = result.split()
         if eval('float(value) %s %s' % (inequality, threshhold)):
-            outliers.append('%-2s-%-5s %-5s-%-9s %-5.2f' % (net, sta, loc, chan, float(value)))
+            outliers.append('%-2s_%-5s %-5s-%-9s %-5.2f' % (net, sta, loc, chan, float(value)))
     return outliers
 
 def availability_outliers(results, inequality, threshhold):
@@ -79,7 +88,7 @@ def availability_outliers(results, inequality, threshhold):
     stations = {}
     for result in results:
         date, net, sta, loc, chan, metric, value = result.split()
-        if net not in networks_blacklist:
+        if net not in availability_blacklist:
             netsta = '_'.join([net,sta])
             if netsta not in stations.keys():
                 stations[netsta] = [[],[]]
