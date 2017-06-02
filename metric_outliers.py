@@ -142,7 +142,8 @@ def write_to_file(date, new, ongoing, resolved, mailto=False):
     fob = open('/home/ambaker/metric_outliers/metric_outliers.txt','w')
     fob.write('\n'.join(output))
     fob.close()
-    # print '\n'.join(output)
+    if debug:
+        print '\n'.join(output)
     if mailto:
         command = 'mutt -s \"Metric Outliers for %s\" ' % date.strftime('%Y-%m-%d (%j)')
         command += '-a /home/ambaker/metric_outliers/metric_outliers.txt -- '
