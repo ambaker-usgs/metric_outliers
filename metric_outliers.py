@@ -79,7 +79,7 @@ def gain_outliers(results, inequality, threshhold):
     for result in results:
         date, net, sta, loc, chan, metric, value = result.split()
         if eval('float(value) %s %s' % (inequality, threshhold)):
-            outliers.append('%-2s_%-5s %-5s-%-9s %-5.2f' % (net, sta, loc, chan, float(value)))
+            outliers.append('%-2s_%-5s %-5s-%-9s' % (net, sta, loc, chan))
     return outliers
 
 def availability_outliers(results, inequality, threshhold):
