@@ -10,7 +10,7 @@ availability_blacklist = ['GT','II']
 
 #threshholds
 dead_chan_threshhold = 1.0
-mass_pos_threshhold = 95.0
+mass_pos_threshhold = 95
 timing_qual_threshhold = 60.0
 gaps_threshhold = 5.0
 gain_threshhold = 1.0
@@ -96,7 +96,7 @@ def availability_outliers(results, inequality, threshhold):
             stations[netsta][1].append(float(value))
     for netsta, vals in stations.items():
         average = numpy.average(vals[1])
-        if (min(vals[1]) + threshhold) <= average <= (max(vals[1]) - threshhold):
+        if (min(vals[1]) + threshhold) <= average or average <= (max(vals[1]) - threshhold):
             outliers.append('%-8s %6.2f min  %6.2f avg  %6.2f max' % (netsta, min(vals[1]), average, max(vals[1])))
     return outliers
 
