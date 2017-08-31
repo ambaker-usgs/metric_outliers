@@ -16,7 +16,7 @@ gaps_threshhold = 5.0
 gain_threshhold = 1.0
 availability_threshhold = 10.0
 
-debug = False
+debug = True
 
 class Issue(object):
     def __init__(self, nickname, newer_issues, older_issues):
@@ -38,6 +38,8 @@ def query_dqa(metric, date):
     results = ''
     for server in ['prod','dqags']:
         results += commands.getstatusoutput(path_to_dqa + 'dqa4h.py -w %s -m %s -b %s -e %s' % (server, metric, date, date))[1]
+    if metric == 'DeadChannelMetric:4-8':
+        print 'XXX\n', results, '\n'
     return results.strip().split('\n')
 
 def metric_outliers(results, inequality, threshhold):
@@ -70,6 +72,7 @@ def gap_outliers(results, inequality, threshhold):
             outlier_counts[netsta] += 1
     outliers = []
     for netsta, count in outlier_counts.items():
+        net, sta = netsta.split('_')
         outliers.append('%-2s_%-5s %s channels' % (net, sta, count))
     return outliers
 
