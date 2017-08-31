@@ -38,8 +38,6 @@ def query_dqa(metric, date):
     results = ''
     for server in ['prod','dqags']:
         results += commands.getstatusoutput(path_to_dqa + 'dqa4h.py -w %s -m %s -b %s -e %s' % (server, metric, date, date))[1]
-    if metric == 'DeadChannelMetric:4-8':
-        print 'XXX\n', results, '\n'
     return results.strip().split('\n')
 
 def metric_outliers(results, inequality, threshhold):
