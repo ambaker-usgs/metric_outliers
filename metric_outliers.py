@@ -16,7 +16,7 @@ gaps_threshhold = 5.0
 gain_threshhold = 1.0
 availability_threshhold = 10.0
 
-debug = True
+debug = False
 
 class Issue(object):
     def __init__(self, nickname, newer_issues, older_issues):
