@@ -16,7 +16,7 @@ gaps_threshhold = 5.0
 gain_threshhold = 1.0
 availability_threshhold = 10.0
 
-debug = True
+debug = False
 
 class Issue(object):
     def __init__(self, nickname, newer_issues, older_issues):
@@ -147,7 +147,7 @@ def write_to_file(date, new, ongoing, resolved, mailto=False):
         print '\n'.join(output)
     if mailto:
         command = 'mutt -s \"Metric Outliers for %s\" ' % date.strftime('%Y-%m-%d (%j)')
-        command += '-a /home/ambaker/metric_outliers/metric_outliers.txt -- '
+        command += '-i /home/ambaker/metric_outliers/metric_outliers.txt -- '
         if not debug:
             command += 'tstorm@usgs.gov,aringler@usgs.gov,dwilson@usgs.gov,aaholland@usgs.gov, met@iris.washington.edu, lsandoval@usgs.gov, kschramm@usgs.gov,'
         command += 'ambaker@usgs.gov </dev/null'
