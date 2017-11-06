@@ -37,7 +37,9 @@ def query_dqa(metric, date):
     date = date.strftime('%Y-%m-%d')
     results = ''
     for server in ['prod','dqags']:
+        #print(path_to_dqa + 'dqa4h.py -w %s -m %s -b %s -e %s' % (server, metric, date, date))
         results += commands.getstatusoutput(path_to_dqa + 'dqa4h.py -w %s -m %s -b %s -e %s' % (server, metric, date, date))[1]
+    #print(results.strip().split('\n'))
     return results.strip().split('\n')
 
 def metric_outliers(results, inequality, threshhold):
@@ -60,18 +62,22 @@ def timing_outliers(results, inequality, threshhold):
 
 def gap_outliers(results, inequality, threshhold):
     'Reports any outlying stations based on gaps'
-    outlier_counts = {}
+    outlier_channel_counts = {}
+    outlier_gap_counts = {}
     for result in results:
         date, net, sta, loc, chan, metric, value = result.split()
         if eval('float(value) %s %s' % (inequality, threshhold)):
             netsta = '_'.join([net,sta])
-            if netsta not in outlier_counts.keys():
-                outlier_counts[netsta] = 0
-            outlier_counts[netsta] += 1
+            if netsta not in outlier_channel_counts.keys():
+                outlier_channel_counts[netsta] = 0
+            if netsta not in outlier_gap_counts.keys():
+                outlier_gap_counts[netsta] = 0
+            outlier_channel_counts[netsta] += 1
+            outlier_gap_counts[netsta] += int(value.split('.')[0])
     outliers = []
-    for netsta, count in outlier_counts.items():
+    for netsta, chans in outlier_channel_counts.items():
         net, sta = netsta.split('_')
-        outliers.append('%-2s_%-5s %s channels' % (net, sta, count))
+        outliers.append('%-2s_%-5s %2s channels, %4s gaps' % (net, sta, chans, outlier_gap_counts[netsta]))
     return outliers
 
 def gain_outliers(results, inequality, threshhold):
@@ -141,12 +147,13 @@ def write_to_file(date, new, ongoing, resolved, mailto=False):
     output.append('\n == RESOLVED ISSUES ==')
     output.extend(resolved)
     fob = open('/home/ambaker/metric_outliers/metric_outliers.txt','w')
-    fob.write('\n'.join(output))
+    fob.write('\n'.join(output) + '\n')
     fob.close()
     if debug:
         print '\n'.join(output)
     if mailto:
         command = 'mutt -s \"Metric Outliers for %s\" ' % date.strftime('%Y-%m-%d (%j)')
+        command += '-i /home/ambaker/metric_outliers/metric_outliers.txt '
         command += '-a /home/ambaker/metric_outliers/metric_outliers.txt -- '
         if not debug:
             command += 'tstorm@usgs.gov,aringler@usgs.gov,dwilson@usgs.gov,aaholland@usgs.gov, met@iris.washington.edu, lsandoval@usgs.gov, kschramm@usgs.gov,'
