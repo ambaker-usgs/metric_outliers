@@ -153,8 +153,12 @@ def write_to_file(date, new, ongoing, resolved, mailto=False):
         print '\n'.join(output)
     if mailto:
         command = 'mutt -s \"Metric Outliers for %s\" ' % date.strftime('%Y-%m-%d (%j)')
+<<<<<<< HEAD
         command += '-i /home/ambaker/metric_outliers/metric_outliers.txt '
         command += '-a /home/ambaker/metric_outliers/metric_outliers.txt -- '
+=======
+        command += '-i /home/ambaker/metric_outliers/metric_outliers.txt -- '
+>>>>>>> 123b59cd54b6409908e09c32996202d2810aae48
         if not debug:
             command += 'tstorm@usgs.gov,aringler@usgs.gov,dwilson@usgs.gov,aaholland@usgs.gov, met@iris.washington.edu, lsandoval@usgs.gov, kschramm@usgs.gov,'
         command += 'ambaker@usgs.gov </dev/null'
