@@ -1,4 +1,5 @@
 import commands
+import glob
 import numpy
 import os
 
@@ -83,10 +84,18 @@ def gap_outliers(results, inequality, threshhold):
 def gain_outliers(results, inequality, threshhold):
     'Reports any outlying stations based on gain differences'
     outliers = []
+    calibrated_stns = []
     for result in results:
         date, net, sta, loc, chan, metric, value = result.split()
         if eval('float(value) %s %s' % (inequality, threshhold)):
             outliers.append('%-2s_%-5s %-5s-%-9s' % (net, sta, loc, chan))
+            if glob.glob('/msd/%s_%s/%s/_BC*.512.seed' % (net, sta, UTCDateTime(date).strftime('%Y/%j'))):
+                calibrated_stns.append('_'.join([net, sta]))
+    for index in range(len(outliers)):
+        for stn in calibrated_stns:
+            if stn in outliers[index]:
+                outliers[index] += ' cal day %s' % UTCDateTime(date).strftime('%j')
+                break
     return outliers
 
 def availability_outliers(results, inequality, threshhold):
@@ -153,12 +162,8 @@ def write_to_file(date, new, ongoing, resolved, mailto=False):
         print '\n'.join(output)
     if mailto:
         command = 'mutt -s \"Metric Outliers for %s\" ' % date.strftime('%Y-%m-%d (%j)')
-<<<<<<< HEAD
         command += '-i /home/ambaker/metric_outliers/metric_outliers.txt '
         command += '-a /home/ambaker/metric_outliers/metric_outliers.txt -- '
-=======
-        command += '-i /home/ambaker/metric_outliers/metric_outliers.txt -- '
->>>>>>> 123b59cd54b6409908e09c32996202d2810aae48
         if not debug:
             command += 'tstorm@usgs.gov,aringler@usgs.gov,dwilson@usgs.gov,aaholland@usgs.gov, met@iris.washington.edu, lsandoval@usgs.gov, kschramm@usgs.gov,'
         command += 'ambaker@usgs.gov </dev/null'
