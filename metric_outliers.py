@@ -1,4 +1,6 @@
-import commands
+# import argparse
+import sys
+import subprocess
 import glob
 import numpy
 import os
@@ -18,6 +20,7 @@ gain_threshhold = 1.0
 availability_threshhold = 10.0
 
 debug = False
+mailto = False
 
 class Issue(object):
     def __init__(self, nickname, newer_issues, older_issues):
@@ -38,8 +41,8 @@ def query_dqa(metric, date):
     date = date.strftime('%Y-%m-%d')
     results = ''
     for server in ['prod','dqags']:
-        #print(path_to_dqa + 'dqa4h.py -w %s -m %s -b %s -e %s' % (server, metric, date, date))
-        results += commands.getstatusoutput(path_to_dqa + 'dqa4h.py -w %s -m %s -b %s -e %s' % (server, metric, date, date))[1]
+        # print(path_to_dqa + 'dqa4h.py -w %s -m %s -b %s -e %s' % (server, metric, date, date))
+        results += subprocess.getstatusoutput(path_to_dqa + 'dqa4h.py -w %s -m %s -b %s -e %s' % (server, metric, date, date))[1]
     #print(results.strip().split('\n'))
     return results.strip().split('\n')
 
@@ -48,6 +51,7 @@ def metric_outliers(results, inequality, threshhold):
     outliers = []
     for result in results:
         date, net, sta, loc, chan, metric, value = result.split()
+        # print(date,net,sta,loc,chan,metric,value)
         if eval('float(value) %s %s' % (inequality, threshhold)):
             outliers.append('%-2s_%-5s %-2s-%-3s' % (net, sta, loc, chan))
     return outliers
@@ -119,7 +123,7 @@ def availability_outliers(results, inequality, threshhold):
 def make_readable(nickname, outliers):
     'Prints the outlying stations in a legible format'
     for outlier in set(outliers):
-        print '%s: %s' % (nickname, outlier)
+        print ('%s: %s' % (nickname, outlier))
 
 def sort_issues(*issues):
     'Sorts the issues into new, ongoing, and resolved'
@@ -159,7 +163,7 @@ def write_to_file(date, new, ongoing, resolved, mailto=False):
     fob.write('\n'.join(output) + '\n')
     fob.close()
     if debug:
-        print '\n'.join(output)
+        print ('\n'.join(output))
     if mailto:
         command = 'mutt -s \"Metric Outliers for %s\" ' % date.strftime('%Y-%m-%d (%j)')
         command += '-i /home/ambaker/metric_outliers/metric_outliers.txt '
@@ -167,10 +171,17 @@ def write_to_file(date, new, ongoing, resolved, mailto=False):
         if not debug:
             command += 'tstorm@usgs.gov,aringler@usgs.gov,dwilson@usgs.gov,aaholland@usgs.gov, met@iris.washington.edu, lsandoval@usgs.gov, kschramm@usgs.gov,'
         command += 'ambaker@usgs.gov </dev/null'
-        commands.getstatusoutput(command)
-    commands.getstatusoutput('rm /home/ambaker/metric_outliers/metric_outliers.txt')
+        subprocess.getstatusoutput(command)
+    subprocess.getstatusoutput('rm /home/ambaker/metric_outliers/metric_outliers.txt')
 
 if __name__ == '__main__':
+    for each in sys.argv:
+        if each == '-d':
+            debug = True
+        if each == '-m':
+            mailto = True
+    # print('Debug: ', debug)
+    # print('Mailto:', mailto)
     date = UTCDateTime.now() - 2*24*60*60
     #dead channels
     dead_channel_new = metric_outliers(query_dqa('DeadChannelMetric:4-8', date), '<', dead_chan_threshhold)
@@ -198,4 +209,4 @@ if __name__ == '__main__':
     avail = Issue('Avail%', avail_new, avail_old)
     #sort and write a file
     new, ongoing, old = sort_issues(dead_channel, pegged_masses, timing, gaps, gain, avail)
-    write_to_file(date, new, ongoing, old, True)
+    write_to_file(date, new, ongoing, old, mailto)
