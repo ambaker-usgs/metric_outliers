@@ -41,19 +41,24 @@ def query_dqa(metric, date):
     date = date.strftime('%Y-%m-%d')
     results = ''
     for server in ['prod','dqags']:
-        # print(path_to_dqa + 'dqa4h.py -w %s -m %s -b %s -e %s' % (server, metric, date, date))
         results += subprocess.getstatusoutput(path_to_dqa + 'dqa4h.py -w %s -m %s -b %s -e %s' % (server, metric, date, date))[1]
     #print(results.strip().split('\n'))
-    return results.strip().split('\n')
+    results = results.strip().split('\n')
+    if results == ['']:
+        results = []
+    return results
 
 def metric_outliers(results, inequality, threshhold):
     'Reports any outlying stations for given metric and threshhold'
     outliers = []
     for result in results:
-        date, net, sta, loc, chan, metric, value = result.split()
-        # print(date,net,sta,loc,chan,metric,value)
-        if eval('float(value) %s %s' % (inequality, threshhold)):
-            outliers.append('%-2s_%-5s %-2s-%-3s' % (net, sta, loc, chan))
+        try:
+            date, net, sta, loc, chan, metric, value = result.split()
+            # print(date,net,sta,loc,chan,metric,value)
+            if eval('float(value) %s %s' % (inequality, threshhold)):
+                outliers.append('%-2s_%-5s %-2s-%-3s' % (net, sta, loc, chan))
+        except:
+            print('Unable to run metric. (%s)' % result)
     return outliers
 
 def timing_outliers(results, inequality, threshhold):
@@ -209,4 +214,6 @@ if __name__ == '__main__':
     avail = Issue('Avail%', avail_new, avail_old)
     #sort and write a file
     new, ongoing, old = sort_issues(dead_channel, pegged_masses, timing, gaps, gain, avail)
+    if not new:
+        new.append('No new issues or DQA does not have data for %s' % date.strftime('%Y-%m-%d (%j)'))
     write_to_file(date, new, ongoing, old, mailto)
