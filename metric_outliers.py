@@ -164,20 +164,20 @@ def write_to_file(date, new, ongoing, resolved, mailto=False):
     output.extend(ongoing)
     output.append('\n == RESOLVED ISSUES ==')
     output.extend(resolved)
-    fob = open('~/metric_outliers/metric_outliers.txt','w')
+    fob = open('metric_outliers.txt','w')
     fob.write('\n'.join(output) + '\n')
     fob.close()
     if debug:
         print ('\n'.join(output))
     if mailto:
         command = 'mutt -s \"Metric Outliers for %s\" ' % date.strftime('%Y-%m-%d (%j)')
-        command += '-i ~/metric_outliers/metric_outliers.txt '
-        command += '-a ~/metric_outliers/metric_outliers.txt -- '
+        command += '-i metric_outliers.txt '
+        command += '-a metric_outliers.txt -- '
         if not debug:
             command += 'tstorm@usgs.gov,aringler@usgs.gov,dwilson@usgs.gov,aaholland@usgs.gov, met@iris.washington.edu, lsandoval@usgs.gov,ranthony@usgs.gov, aalejandro@usgs.gov,svmoore@usgs.gov '
         command += 'ambaker@usgs.gov, jholland@usgs.gov </dev/null'
         subprocess.getstatusoutput(command)
-    subprocess.getstatusoutput('rm ~/metric_outliers/metric_outliers.txt')
+    subprocess.getstatusoutput('rm metric_outliers.txt')
 
 if __name__ == '__main__':
     for each in sys.argv:
