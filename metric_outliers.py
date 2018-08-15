@@ -174,7 +174,7 @@ def write_to_file(date, new, ongoing, resolved, mailto=False):
         command += '-i metric_outliers.txt '
         command += '-a metric_outliers.txt -- '
         if not debug:
-            command += 'tstorm@usgs.gov,aringler@usgs.gov,dwilson@usgs.gov,aaholland@usgs.gov, met@iris.washington.edu, lsandoval@usgs.gov,ranthony@usgs.gov, aalejandro@usgs.gov,svmoore@usgs.gov '
+            command += 'tstorm@usgs.gov,aringler@usgs.gov,dwilson@usgs.gov, met@iris.washington.edu, lsandoval@usgs.gov,ranthony@usgs.gov, aalejandro@usgs.gov,svmoore@usgs.gov,rrodd@contractor.usgs.gov '
         command += 'ambaker@usgs.gov, jholland@usgs.gov </dev/null'
         subprocess.getstatusoutput(command)
     subprocess.getstatusoutput('rm metric_outliers.txt')
